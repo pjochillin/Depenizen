@@ -98,7 +98,7 @@ public class JobsJobTag implements ObjectTag {
     }
 
     public PlayerTag getOwner() {
-        return new PlayerTag(jobOwner.getPlayerUUID());
+        return new PlayerTag(jobOwner.getUniqueId());
     }
 
     public void setOwner(PlayerTag player) {

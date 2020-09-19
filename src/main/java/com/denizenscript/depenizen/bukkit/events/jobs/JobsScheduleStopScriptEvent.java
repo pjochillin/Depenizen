@@ -63,7 +63,7 @@ public class JobsScheduleStopScriptEvent extends BukkitScriptEvent implements Li
 
     @Override
     public boolean applyDetermination(ScriptPath path, ObjectTag determinationObj) {
-        if (Argument.valueOf(determinationObj.toString().toLowerCase()).matchesArgumentList(JobsJobTag.class)) {
+        if (Argument.valueOf(determinationObj.toString()).matchesArgumentList(JobsJobTag.class)) {
             List<String> list = new ArrayList<>();
             for (int i = 0; i < ((ListTag) determinationObj).size(); i++) {
                 list.add(((JobsJobTag) ((ListTag) determinationObj).getObject(i)).getJob().getName());
