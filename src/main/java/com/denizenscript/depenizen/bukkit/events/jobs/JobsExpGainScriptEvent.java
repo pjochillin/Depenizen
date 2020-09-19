@@ -83,7 +83,7 @@ public class JobsExpGainScriptEvent extends BukkitScriptEvent implements Listene
 
     @Override
     public boolean applyDetermination(ScriptPath path, ObjectTag determinationObj) {
-        if (determinationObj instanceof ElementTag) {
+        if (determinationObj instanceof ElementTag && ((ElementTag) determinationObj).isDouble()) {
             event.setExp(((ElementTag) determinationObj).asDouble());
             return true;
         }

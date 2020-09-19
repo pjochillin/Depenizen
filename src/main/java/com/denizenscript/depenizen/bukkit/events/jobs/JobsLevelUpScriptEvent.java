@@ -3,9 +3,9 @@ package com.denizenscript.depenizen.bukkit.events.jobs;
 import com.denizenscript.denizen.events.BukkitScriptEvent;
 import com.denizenscript.denizen.objects.PlayerTag;
 import com.denizenscript.denizen.utilities.implementation.BukkitScriptEntryData;
+import com.denizenscript.denizencore.objects.Argument;
 import com.denizenscript.denizencore.objects.ObjectTag;
 import com.denizenscript.denizencore.objects.core.ElementTag;
-import com.denizenscript.denizencore.objects.core.MapTag;
 import com.denizenscript.denizencore.scripts.ScriptEntryData;
 import com.denizenscript.depenizen.bukkit.objects.jobs.JobsJobTag;
 import com.gamingmesh.jobs.Jobs;
@@ -33,11 +33,15 @@ public class JobsLevelUpScriptEvent extends BukkitScriptEvent implements Listene
     // @Context
     // <context.job> returns the JobsJobTag that the player leveled up.
     // <context.level> returns an ElementTag of the job's new level.
-    // <context.sound> returns a MapTag of the sound's information with keys 'sound', 'pitch', and 'volume'.
+    // <context.sound> returns an ElementTag of the sound's name.
     // Refer to <@link url https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html> for sounds.
+    // <context.volume> returns an ElementTag of the sound's volume.
+    // <context.pitch> returns an ElementTag of the sound's pitch.
     //
     // @Determine
-    // MapTag to set the sound's name, pitch, and volume (with keys 'sound', 'pitch', and 'volume').
+    // "SOUND:" + ElementTag to set the sound that plays.
+    // "VOLUME:" + ElementTag(Number) to set the sound's volume.
+    // "PITCH:" + ElementTag(Number) to set the sound's pitch.
     //
     // @Plugin Depenizen, Jobs
     //
@@ -88,12 +92,23 @@ public class JobsLevelUpScriptEvent extends BukkitScriptEvent implements Listene
 
     @Override
     public boolean applyDetermination(ScriptPath path, ObjectTag determinationObj) {
-        if (determinationObj instanceof MapTag) {
-            MapTag map = (MapTag) determinationObj;
-            event.setSound(Sound.valueOf(map.getObject("sound").toString()));
-            event.setSoundPitch(((ElementTag) map.getObject("pitch")).asInt());
-            event.setSoundVolume(((ElementTag) map.getObject("volume")).asInt());
-            return true;
+        if (determinationObj instanceof ElementTag) {
+            String lower = ((ElementTag) determinationObj).asString().toLowerCase();
+            if (lower.startsWith("sound:")) {
+                Sound sound = Sound.valueOf(lower.substring("sound:".length()).toUpperCase());
+                event.setSound(sound);
+                return true;
+            }
+            else if (lower.startsWith("volume:")) {
+                int volume = Argument.valueOf(lower.substring("volume:".length())).asElement().asInt();
+                event.setSoundVolume(volume);
+                return true;
+            }
+            else if (lower.startsWith("pitch:")) {
+                int pitch = Argument.valueOf(lower.substring("pitch:".length())).asElement().asInt();
+                event.setSoundPitch(pitch);
+                return true;
+            }
         }
         return super.applyDetermination(path, determinationObj);
     }
@@ -107,11 +122,13 @@ public class JobsLevelUpScriptEvent extends BukkitScriptEvent implements Listene
             return level;
         }
         else if (name.equals("sound")) {
-            MapTag map = new MapTag();
-            map.putObject("sound", new ElementTag(event.getSound().toString()));
-            map.putObject("pitch", new ElementTag(event.getSoundPitch()));
-            map.putObject("volume", new ElementTag(event.getSoundVolume()));
-            return map;
+            return new ElementTag(event.getSound().toString());
+        }
+        else if (name.equals("volume")) {
+            return new ElementTag(event.getSoundVolume());
+        }
+        else if (name.equals("pitch")) {
+            return new ElementTag(event.getSoundPitch());
         }
         return super.getContext(name);
     }

@@ -24,7 +24,7 @@ public class JobsBridge extends Bridge {
 
     @Override
     public void init() {
-        ObjectFetcher.registerWithObjectFetcher(JobsJobTag.class);
+        ObjectFetcher.registerWithObjectFetcher(JobsJobTag.class, JobsJobTag.tagProcessor);
         PropertyParser.registerProperty(JobPlayer.class, JobsJobTag.class);
         PropertyParser.registerProperty(JobsPlayerProperties.class, PlayerTag.class);
         ScriptEvent.registerScriptEvent(new JobsJoinScriptEvent());

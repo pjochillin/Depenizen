@@ -1,5 +1,6 @@
 package com.denizenscript.depenizen.bukkit.objects.jobs;
 
+import com.denizenscript.denizencore.tags.ObjectTagProcessor;
 import com.gamingmesh.jobs.Jobs;
 import com.gamingmesh.jobs.container.Job;
 import com.gamingmesh.jobs.container.JobProgression;
@@ -151,6 +152,8 @@ public class JobsJobTag implements ObjectTag {
     public String toString() {
         return identify();
     }
+
+    public static ObjectTagProcessor<JobsJobTag> tagProcessor = new ObjectTagProcessor<>();
 
     @Override
     public String getAttribute(Attribute attribute) {

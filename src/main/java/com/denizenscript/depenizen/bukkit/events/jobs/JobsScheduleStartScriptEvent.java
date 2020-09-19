@@ -1,6 +1,7 @@
 package com.denizenscript.depenizen.bukkit.events.jobs;
 
 import com.denizenscript.denizen.events.BukkitScriptEvent;
+import com.denizenscript.denizencore.objects.Argument;
 import com.denizenscript.denizencore.objects.ObjectTag;
 import com.denizenscript.denizencore.objects.core.ElementTag;
 import com.denizenscript.denizencore.objects.core.ListTag;
@@ -60,7 +61,7 @@ public class JobsScheduleStartScriptEvent extends BukkitScriptEvent implements L
 
     @Override
     public boolean applyDetermination(ScriptPath path, ObjectTag determinationObj) {
-        if (determinationObj instanceof ListTag) {
+        if (Argument.valueOf(determinationObj.toString().toLowerCase()).matchesArgumentList(JobsJobTag.class)) {
             List<String> list = new ArrayList<>();
             for (int i = 0; i < ((ListTag) determinationObj).size(); i++) {
                 list.add(((JobsJobTag) ((ListTag) determinationObj).getObject(i)).getJob().getName());
