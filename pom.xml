@@ -144,9 +144,9 @@
             <systemPath>${basedir}/lib/GriefPrevention.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>com.gamingmesh</groupId>
+            <groupId>com.github.Zrips</groupId>
             <artifactId>Jobs</artifactId>
-            <version>3.6.3</version>
+            <version>4.16.1</version>
             <scope>system</scope>
             <systemPath>${basedir}/lib/Jobs.jar</systemPath>
         </dependency>

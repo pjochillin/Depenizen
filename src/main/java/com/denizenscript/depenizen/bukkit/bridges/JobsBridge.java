@@ -1,5 +1,7 @@
 package com.denizenscript.depenizen.bukkit.bridges;
 
+import com.denizenscript.denizencore.events.ScriptEvent;
+import com.denizenscript.depenizen.bukkit.events.jobs.*;
 import com.denizenscript.depenizen.bukkit.properties.jobs.JobPlayer;
 import com.denizenscript.depenizen.bukkit.Bridge;
 import com.denizenscript.depenizen.bukkit.commands.jobs.JobsCommand;
@@ -25,6 +27,13 @@ public class JobsBridge extends Bridge {
         ObjectFetcher.registerWithObjectFetcher(JobsJobTag.class);
         PropertyParser.registerProperty(JobPlayer.class, JobsJobTag.class);
         PropertyParser.registerProperty(JobsPlayerProperties.class, PlayerTag.class);
+        ScriptEvent.registerScriptEvent(new JobsJoinScriptEvent());
+        ScriptEvent.registerScriptEvent(new JobsLeaveScriptEvent());
+        ScriptEvent.registerScriptEvent(new JobsLevelUpScriptEvent());
+        ScriptEvent.registerScriptEvent(new JobsPaymentScriptEvent());
+        ScriptEvent.registerScriptEvent(new JobsExpGainScriptEvent());
+        ScriptEvent.registerScriptEvent(new JobsScheduleStartScriptEvent());
+        ScriptEvent.registerScriptEvent(new JobsScheduleStopScriptEvent());
         TagManager.registerTagHandler(new TagRunnable.RootForm() {
             @Override
             public void run(ReplaceableTagEvent event) {
