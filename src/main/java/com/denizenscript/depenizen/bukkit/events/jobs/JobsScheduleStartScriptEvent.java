@@ -61,10 +61,11 @@ public class JobsScheduleStartScriptEvent extends BukkitScriptEvent implements L
 
     @Override
     public boolean applyDetermination(ScriptPath path, ObjectTag determinationObj) {
-        if (Argument.valueOf(determinationObj.toString()).matchesArgumentList(JobsJobTag.class)) {
+        String determination = determinationObj.toString();
+        if (Argument.valueOf(determination).matchesArgumentList(JobsJobTag.class)) {
             List<String> list = new ArrayList<>();
-            for (int i = 0; i < ((ListTag) determinationObj).size(); i++) {
-                list.add(((JobsJobTag) ((ListTag) determinationObj).getObject(i)).getJob().getName());
+            for (JobsJobTag j : ListTag.valueOf(determination, getTagContext(path)).filter(JobsJobTag.class, path.container, true)) {
+                list.add(j.getJob().getName());
             }
             event.getSchedule().setJobs(list);
             return true;

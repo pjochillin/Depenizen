@@ -1,6 +1,8 @@
 package com.denizenscript.depenizen.bukkit.objects.jobs;
 
+import com.denizenscript.denizencore.tags.Attribute;
 import com.denizenscript.denizencore.tags.ObjectTagProcessor;
+import com.denizenscript.denizencore.tags.TagRunnable;
 import com.gamingmesh.jobs.Jobs;
 import com.gamingmesh.jobs.container.Job;
 import com.gamingmesh.jobs.container.JobProgression;
@@ -11,7 +13,6 @@ import com.denizenscript.denizencore.objects.Fetchable;
 import com.denizenscript.denizencore.objects.ObjectFetcher;
 import com.denizenscript.denizencore.objects.ObjectTag;
 import com.denizenscript.denizencore.objects.properties.PropertyParser;
-import com.denizenscript.denizencore.tags.Attribute;
 import com.denizenscript.denizencore.tags.TagContext;
 
 public class JobsJobTag implements ObjectTag {
@@ -118,6 +119,11 @@ public class JobsJobTag implements ObjectTag {
     }
 
     @Override
+    public ObjectTag getObjectAttribute(Attribute attribute) {
+        return tagProcessor.getObjectAttribute(this, attribute);
+    }
+
+    @Override
     public ObjectTag setPrefix(String prefix) {
         this.prefix = prefix;
         return this;
@@ -135,7 +141,7 @@ public class JobsJobTag implements ObjectTag {
 
     @Override
     public String getObjectType() {
-        return "Job";
+        return "JobsJob";
     }
 
     @Override
@@ -153,50 +159,40 @@ public class JobsJobTag implements ObjectTag {
         return identify();
     }
 
-    public static ObjectTagProcessor<JobsJobTag> tagProcessor = new ObjectTagProcessor<>();
+    public static void registerTags() {
 
-    @Override
-    public String getAttribute(Attribute attribute) {
+        // <--[tag]
+        // @attribute <JobsJobTag.max_xp>
+        // @returns ElementTag(Number)
+        // @plugin Depenizen, Jobs
+        // @description
+        // Returns the maximum experience a player can get in a specified job.
+        // -->
+        registerTag("max_xp", (attribute, object) -> {
+            return new ElementTag(object.jobProgression.getMaxExperience());
+        });
 
-        if (jobProgression != null) {
+        // <--[tag]
+        // @attribute <JobsJobTag.xp_level>
+        // @returns ElementTag(Number)
+        // @plugin Depenizen, Jobs
+        // @description
+        // Returns the current experience level a player has in a specified job.
+        // -->
+        registerTag("xp_level", (attribute, object) -> {
+           return new ElementTag(object.jobProgression.getLevel());
+        });
 
-            if (attribute.startsWith("xp")) {
-                attribute = attribute.fulfill(1);
-
-                // <--[tag]
-                // @attribute <JobsJobTag.xp.max>
-                // @returns ElementTag(Number)
-                // @plugin Depenizen, Jobs
-                // @description
-                // Returns the maximum experience a player can get in a specified job.
-                // -->
-                if (attribute.startsWith("max")) {
-                    return new ElementTag(jobProgression.getMaxExperience())
-                            .getAttribute(attribute.fulfill(1));
-                }
-
-                // <--[tag]
-                // @attribute <JobsJobTag.xp.level>
-                // @returns ElementTag(Number)
-                // @plugin Depenizen, Jobs
-                // @description
-                // Returns the current experience level a player has in a specified job.
-                // -->
-                if (attribute.startsWith("level")) {
-                    return new ElementTag(jobProgression.getLevel())
-                            .getAttribute(attribute.fulfill(1));
-                }
-
-                // <--[tag]
-                // @attribute <JobsJobTag.xp>
-                // @returns ElementTag(Decimal)
-                // @plugin Depenizen, Jobs
-                // @description
-                // Returns the current experience a player has in a specified job.
-                // -->
-                return new ElementTag(jobProgression.getExperience()).getAttribute(attribute);
-            }
-        }
+        // <--[tag]
+        // @attribute <JobsJobTag.xp>
+        // @returns ElementTag(Decimal)
+        // @plugin Depenizen, Jobs
+        // @description
+        // Returns the current experience a player has in a specified job.
+        // -->
+        registerTag("xp", (atribute, object) -> {
+           return new ElementTag(object.jobProgression.getExperience());
+        });
 
         // <--[tag]
         // @attribute <JobsJobTag.color>
@@ -205,10 +201,9 @@ public class JobsJobTag implements ObjectTag {
         // @description
         // Returns the ChatColor of the job.
         // -->
-        if (attribute.startsWith("color")) {
-            return new ElementTag(job.getChatColor().toString())
-                    .getAttribute(attribute.fulfill(1));
-        }
+        registerTag("color", (attribute, object) -> {
+           return new ElementTag(object.job.getChatColor().toString());
+        });
 
         // <--[tag]
         // @attribute <JobsJobTag.description>
@@ -217,36 +212,134 @@ public class JobsJobTag implements ObjectTag {
         // @description
         // Returns the description of the job.
         // -->
-        else if (attribute.startsWith("description")) {
-            return new ElementTag(job.getDescription()).getAttribute(attribute.fulfill(1));
-        }
+        registerTag("description", (attribute, object) -> {
+           return new ElementTag(object.job.getDescription());
+        });
 
-        else if (attribute.startsWith("name")) {
-            attribute = attribute.fulfill(1);
+        // <--[tag]
+        // @attribute <JobsJobTag.short_name>
+        // @returns ElementTag
+        // @plugin Depenizen, Jobs
+        // @description
+        // Returns the shortened name of the job.
+        // -->
+        registerTag("short_name", (attribute, object) -> {
+           return new ElementTag(object.job.getShortName());
+        });
 
-            // <--[tag]
-            // @attribute <JobsJobTag.name.short>
-            // @returns ElementTag
-            // @plugin Depenizen, Jobs
-            // @description
-            // Returns the shortened name of the job.
-            // -->
-            if (attribute.startsWith("short")) {
-                return new ElementTag(job.getShortName())
-                        .getAttribute(attribute.fulfill(1));
-            }
+        // <--[tag]
+        // @attribute <JobsJobTag.name>
+        // @returns ElementTag
+        // @plugin Depenizen, Jobs
+        // @description
+        // Returns the name of the job.
+        // -->
+        registerTag("name", (attribute, object) -> {
+           return new ElementTag(object.job.getName());
+        });
 
-            // <--[tag]
-            // @attribute <JobsJobTag.name>
-            // @returns ElementTag
-            // @plugin Depenizen, Jobs
-            // @description
-            // Returns the name of the job.
-            // -->
-            return new ElementTag(job.getName()).getAttribute(attribute);
-        }
 
-        return new ElementTag(identify()).getAttribute(attribute);
 
     }
+
+    public static void registerTag(String name, TagRunnable.ObjectInterface<JobsJobTag> runnable, String... variants) {
+        tagProcessor.registerTag(name, runnable, variants);
+    }
+
+    public static ObjectTagProcessor<JobsJobTag> tagProcessor = new ObjectTagProcessor<>();
+
+//    @Override
+//    public String getAttribute(Attribute attribute) {
+//
+//        if (jobProgression != null) {
+//
+//            if (attribute.startsWith("xp")) {
+//                attribute = attribute.fulfill(1);
+//
+//                // <--[tag]
+//                // @attribute <JobsJobTag.xp.max>
+//                // @returns ElementTag(Number)
+//                // @plugin Depenizen, Jobs
+//                // @description
+//                // Returns the maximum experience a player can get in a specified job.
+//                // -->
+//                if (attribute.startsWith("max")) {
+//                    return new ElementTag(jobProgression.getMaxExperience())
+//                            .getAttribute(attribute.fulfill(1));
+//                }
+//
+//                // <--[tag]
+//                // @attribute <JobsJobTag.xp.level>
+//                // @returns ElementTag(Number)
+//                // @plugin Depenizen, Jobs
+//                // @description
+//                // Returns the current experience level a player has in a specified job.
+//                // -->
+//                if (attribute.startsWith("level")) {
+//                    return new ElementTag(jobProgression.getLevel())
+//                            .getAttribute(attribute.fulfill(1));
+//                }
+//
+//                // <--[tag]
+//                // @attribute <JobsJobTag.xp>
+//                // @returns ElementTag(Decimal)
+//                // @plugin Depenizen, Jobs
+//                // @description
+//                // Returns the current experience a player has in a specified job.
+//                // -->
+//                return new ElementTag(jobProgression.getExperience()).getAttribute(attribute);
+//            }
+//        }
+//
+//        // <--[tag]
+//        // @attribute <JobsJobTag.color>
+//        // @returns ElementTag
+//        // @plugin Depenizen, Jobs
+//        // @description
+//        // Returns the ChatColor of the job.
+//        // -->
+//        if (attribute.startsWith("color")) {
+//            return new ElementTag(job.getChatColor().toString())
+//                    .getAttribute(attribute.fulfill(1));
+//        }
+//
+//        // <--[tag]
+//        // @attribute <JobsJobTag.description>
+//        // @returns ElementTag
+//        // @plugin Depenizen, Jobs
+//        // @description
+//        // Returns the description of the job.
+//        // -->
+//        else if (attribute.startsWith("description")) {
+//            return new ElementTag(job.getDescription()).getAttribute(attribute.fulfill(1));
+//        }
+//
+//        else if (attribute.startsWith("name")) {
+//            attribute = attribute.fulfill(1);
+//
+//            // <--[tag]
+//            // @attribute <JobsJobTag.name.short>
+//            // @returns ElementTag
+//            // @plugin Depenizen, Jobs
+//            // @description
+//            // Returns the shortened name of the job.
+//            // -->
+//            if (attribute.startsWith("short")) {
+//                return new ElementTag(job.getShortName())
+//                        .getAttribute(attribute.fulfill(1));
+//            }
+//
+//            // <--[tag]
+//            // @attribute <JobsJobTag.name>
+//            // @returns ElementTag
+//            // @plugin Depenizen, Jobs
+//            // @description
+//            // Returns the name of the job.
+//            // -->
+//            return new ElementTag(job.getName()).getAttribute(attribute);
+//        }
+//
+//        return new ElementTag(identify()).getAttribute(attribute);
+//
+//    }
 }
