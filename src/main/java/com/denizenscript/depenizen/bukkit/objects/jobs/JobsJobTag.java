@@ -1,5 +1,6 @@
 package com.denizenscript.depenizen.bukkit.objects.jobs;
 
+import com.denizenscript.denizen.utilities.debugging.Debug;
 import com.denizenscript.denizencore.tags.Attribute;
 import com.denizenscript.denizencore.tags.ObjectTagProcessor;
 import com.denizenscript.denizencore.tags.TagRunnable;
@@ -41,6 +42,11 @@ public class JobsJobTag implements ObjectTag {
     @Fetchable("job")
     public static JobsJobTag valueOf(String string, TagContext context) {
         if (string == null) {
+            return null;
+        }
+
+        if (Jobs.getJob(string) == null) {
+            Debug.echoError("Cannot process list-entry '" + string + "' as type 'JobsJobTag' (does not match expected type).");
             return null;
         }
 
